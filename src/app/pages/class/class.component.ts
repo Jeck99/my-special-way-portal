@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/operator/map';
@@ -10,16 +10,18 @@ import { Class } from '../../models/class.model';
 import { ScheduleService } from '../../services/schedule/schedule.service';
 import { MSWSnackbar } from '../../services/msw-snackbar/msw-snackbar.service';
 import { DeleteClassDialogComponent } from './dialogs/delete/delete-class.dialog';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-grade',
   templateUrl: './class.component.html',
   styleUrls: ['./class.component.scss'],
 })
-export class ClassComponent implements OnInit {
+export class ClassComponent implements OnInit, OnDestroy {
   displayedColumns = ['classname', 'level', 'editDetails', 'deleteClass'];
   dataSource = new MatTableDataSource<Class>();
   resultsLength = 0;
+  subscription: Subscription;
 
   @ViewChild(MatSort)
   sort: MatSort;
@@ -38,9 +40,13 @@ export class ClassComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
 
+  async ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
   private async populateDatasource() {
     try {
-      this.classService.getAllClasses().subscribe((classes) => {
+      this.subscription = this.classService.getAllClasses().subscribe((classes) => {
         this.dataSource.data = [...classes];
       });
     } catch (error) {

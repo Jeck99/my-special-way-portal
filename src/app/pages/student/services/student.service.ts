@@ -10,6 +10,7 @@ import {
   MUTATE_UPDATE_STUDENT,
   MUTATE_DELETE_STUDENT,
 } from './student.graphql';
+import { GET_ALL_CLASSES } from '../../class/services/class.graphql.service';
 import Student, { StudentQuery } from '../../../models/student.model';
 import { DeleteStudentResponse } from '../../../models/responses/delete-student-response.model';
 import { UpdateStudentResponse } from '../../../models/responses/update-student-response.model';
@@ -49,7 +50,8 @@ export class StudentService {
       .mutate({
         mutation: MUTATE_ADD_STUDENT,
         variables: { student: { ...student, class: undefined, class_id: student.class_id } },
-        refetchQueries: [{ query: QUERY_GET_ALL_STUDENTS }],
+        refetchQueries: [{ query: QUERY_GET_ALL_STUDENTS }, { query: GET_ALL_CLASSES }],
+        awaitRefetchQueries: true,
       })
       .toPromise();
   }
@@ -59,7 +61,10 @@ export class StudentService {
       .mutate({
         mutation: MUTATE_UPDATE_STUDENT,
         variables: { id: student._id, student: { ...student, _id: undefined } },
-        refetchQueries: [{ query: QUERY_GET_STUDENT_BY_ID, variables: { id: student._id } }],
+        refetchQueries: [
+          { query: QUERY_GET_STUDENT_BY_ID, variables: { id: student._id } },
+          { query: GET_ALL_CLASSES },
+        ],
         awaitRefetchQueries: true,
       })
       .pipe(map((res: { data: UpdateStudentResponse }) => res.data.updateStudent._id))
@@ -71,7 +76,8 @@ export class StudentService {
       .mutate({
         mutation: MUTATE_DELETE_STUDENT,
         variables: { id },
-        refetchQueries: [{ query: QUERY_GET_ALL_STUDENTS }],
+        refetchQueries: [{ query: QUERY_GET_ALL_STUDENTS }, { query: GET_ALL_CLASSES }],
+        awaitRefetchQueries: true,
       })
       .pipe(map((res: { data: DeleteStudentResponse }) => res.data.deleteStudent))
       .toPromise();

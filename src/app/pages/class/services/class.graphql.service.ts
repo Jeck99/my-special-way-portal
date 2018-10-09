@@ -28,7 +28,7 @@ schedule {
   }
 }`;
 
-const GET_ALL_CLASSES = gql`
+export const GET_ALL_CLASSES = gql`
   {
     classes {
       _id
