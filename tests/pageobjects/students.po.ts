@@ -12,6 +12,7 @@ export default class StudentsPage {
   lastName: Selector;
   username: Selector;
   classId: Selector;
+  classIdOption: Selector;
   classIdFirstOption: Selector;
   password: Selector;
   firstNameErr: Selector;
@@ -34,6 +35,7 @@ export default class StudentsPage {
     this.firstName = Selector('[name$="firstname"]');
     this.lastName = Selector('[name$="lastname"]');
     this.classId = Selector('[name$="class_id"]');
+    this.classIdOption = Selector('[class="mat-option-text"]');
     this.classIdFirstOption = Selector('[class="mat-option-text"]').withExactText('טיטאן');
     this.password = Selector('[name$="password"]');
     this.usernameErr = Selector('[data-test-id$="username-err"]');
