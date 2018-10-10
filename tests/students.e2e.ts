@@ -5,17 +5,20 @@ import StudentPage from './pageobjects/students.po';
 import ClassesPage from './pageobjects/classes.po';
 import ClassDetailsPage from './pageobjects/class-details.po';
 import { Selector, t } from 'testcafe';
+import UsersPage from './pageobjects/users.po';
 
 const loginPage = new LoginPage();
 const navbar = new NavbarPage();
 const studentPage = new StudentPage();
 const classesPage = new ClassesPage();
 const classDetailsPage = new ClassDetailsPage();
+const usersPage = new UsersPage();
 
 const classOneName = 'Class1';
 const classTwoName = 'Class2';
 const studentOneName = 'StudentOne';
 const studentTwoName = 'StudentTwo';
+const teacherOneName = 'TeacherOne';
 
 fixture(`Student tests`)
   .page(testEnvironment.feUrl)
@@ -31,6 +34,8 @@ async function studentExists(studentName: string) {
   const studentNameSelector = Selector('.username').withExactText(studentName);
   return await studentNameSelector.exists;
 }
+
+async function teacherExists(teacherName: string) {}
 
 function getDeleteClassButtonSelector(className: string) {
   return Selector(`[data-test-id=delete-class-button-${className}]`);
@@ -60,12 +65,12 @@ async function createClass(className: string) {
   if (await classExists(className)) {
     await deleteClass(className);
   }
-  await t
-    .click(classesPage.addClassButton)
-    .typeText(classDetailsPage.classNameInput, className)
-    .click(classDetailsPage.gradeSelect)
-    .click(classDetailsPage.gradeSelectOption)
-    .click(classDetailsPage.backToClassButton);
+  await t.click(classesPage.addClassButton);
+  await t.typeText(classDetailsPage.classNameInput, className);
+  await t.click(classDetailsPage.gradeSelect);
+  await t.click(classDetailsPage.gradeSelectOption);
+  await t.click(classDetailsPage.backToClassButton);
+  await t.expect(await classExists(className)).ok();
 }
 
 async function createStudent(studentName: string, className: string) {
@@ -85,6 +90,13 @@ async function createStudentForClass(studentName: string, className: string) {
     await deleteStudent(studentName);
   }
   await createStudent(studentName, className);
+}
+
+async function createTeacherForClass(teacherName: string, className: string) {
+  if (await teacherExists(teacherName)) {
+    await deleteTeacher(teacherName);
+  }
+  await createTeacher(teacherName, className);
 }
 
 /*test('new and existing student form error messages display correctly', async () => {
@@ -122,4 +134,6 @@ test('teacher should show only students that are in his class', async () => {
   await navbar.navigateToStudentsPage();
   await createStudentForClass(studentOneName, classOneName);
   await createStudentForClass(studentTwoName, classTwoName);
+  await navbar.navigateToUsersPage();
+  await createTeacherForClass(teacherOneName, classOneName);
 });
